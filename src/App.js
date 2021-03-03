@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import axios from 'axios';
 
 function App() {
@@ -18,16 +18,25 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (Object.keys(location).length !== 0) {
+    if (Object.keys(location).length === 0) {
+      return;
+    }
+
+    if (!sessionStorage.getItem(location.name)) {
       axios.get(`https://api.openweathermap.org/data/2.5/onecall?lat=${location.lat}&lon=${location.lon}&exclude=minutely,hourly,alerts&appid=${process.env.REACT_APP_WEATHER_API_KEY}&units=metric`)
-        .then(res => {setWeather(res.data)})
+        .then(res => setWeather(res.data))
+    } else {
+      setWeather(JSON.parse(sessionStorage.getItem([location.name])));
     }
   }, [location]);
+
+  useEffect(() => {
+    sessionStorage.setItem([location.name], JSON.stringify(weather));
+  }, [weather])
 
   return (
     <div>
       {location.name}
-      {weather.current.temp}
     </div>
   );
 }
