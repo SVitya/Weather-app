@@ -3,7 +3,6 @@ import {
   CssBaseline,
   Container,
   Paper,
-  Grid,
   Typography
 } from '@material-ui/core';
 
@@ -45,14 +44,12 @@ function App() {
       <Container component='main' maxWidth='xs'>
         <Paper elevation={12} className={styles.paper}>
           <Input setLocationAndWeather={setLocationAndWeather} setLocation={setLocation} setWeather={setWeather} />
-          <Grid item>
-            <Typography>
-              {location}
-            </Typography>
-            <Typography>
-              {weather.temp}
-            </Typography>
-          </Grid>
+          <Typography align='center' variant='h4' className={styles.city}>{location}</Typography>
+          <Typography align='center' variant='h3'>{weather.main}</Typography>
+          <Typography align='center' variant='h1' className={styles.temp}>{Math.round(weather.temp)}&deg;</Typography>
+          <Typography variant='h6'>Feels like: {Math.round(weather.feels_like)}&deg;</Typography>
+          <Typography variant='h6'>Humidity: {weather.humidity}%</Typography>
+          <Typography variant='h6'>Pressure: {weather.pressure}hPa</Typography>
         </Paper> 
       </Container>
     </CssBaseline>

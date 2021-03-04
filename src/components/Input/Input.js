@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Grid,
   TextField
 } from '@material-ui/core';
 
@@ -29,18 +28,14 @@ const Input = ({ setLocationAndWeather, setLocation, setWeather }) => {
   }
 
   return (
-    <Grid container spacing={2}>
-      <Grid item>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label='City'
-            value={input}
-            onChange={handleChange}
-            fullWidth
-          />
-        </form>
-      </Grid>
-    </Grid>
+    <form onSubmit={handleSubmit}>
+      <TextField
+        label='Search'
+        value={input}
+        onChange={handleChange}
+        fullWidth
+      />
+    </form>
   )
 }
 
