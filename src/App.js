@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
@@ -6,15 +6,25 @@ function App() {
   const [weather, setWeather] = useState({});
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      let {latitude, longitude} = pos.coords;
-      axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.REACT_APP_GEOCODE_API_KEY}&language=uk&result_type=locality`)
-        .then(res => setLocation({
-          name: res.data.results[0].address_components[0].long_name,
-          lat: latitude,
-          lon: longitude
-        }))
-    });  
+    if (!sessionStorage.getItem('currentPosition')) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        let {latitude, longitude} = pos.coords;
+
+        axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.REACT_APP_GEOCODE_API_KEY}&language=uk&result_type=locality`)
+          .then(res => {
+            setLocation({
+              name: res.data.results[0].address_components[0].long_name,
+              lat: latitude,
+              lon: longitude
+            });
+            
+            sessionStorage.setItem('currentPosition', JSON.stringify(location));
+          })
+      });  
+    } else {
+      setLocation(JSON.parse(sessionStorage.getItem('currentPosition')));
+    }
+    
   }, []);
 
   useEffect(() => {
@@ -32,7 +42,7 @@ function App() {
 
   useEffect(() => {
     sessionStorage.setItem([location.name], JSON.stringify(weather));
-  }, [weather])
+  }, [weather]);
 
   return (
     <div>
