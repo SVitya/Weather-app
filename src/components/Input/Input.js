@@ -3,9 +3,9 @@ import {
   TextField
 } from '@material-ui/core';
 
-import { fetchWeatherByCity } from '../../api/api';
+import { fetchCoordinates, fetchWeatherByLocation } from '../../api/api';
 
-const Input = ({ setLocationAndWeather, setLocation, setWeather }) => {
+const Input = ({ setLocation, setWeather }) => {
   const [input, setInput] = useState('');
 
   const handleChange = (e) => {
@@ -16,9 +16,13 @@ const Input = ({ setLocationAndWeather, setLocation, setWeather }) => {
     e.preventDefault();
 
     if (!sessionStorage.getItem(input)) {
-      console.log('handleSubmit')
-      fetchWeatherByCity(input)
-        .then((res => setLocationAndWeather(res.data)))
+      fetchCoordinates(input)
+        .then((coordinates => fetchWeatherByLocation(coordinates.lat, coordinates.lng)))
+        .then(weather => {
+          setWeather(weather.data);
+          sessionStorage.setItem(input, JSON.stringify(weather.data));
+        })
+        .then(() => setLocation(input))
     } else {
       setLocation(input);
       setWeather(JSON.parse(sessionStorage.getItem(input)));
