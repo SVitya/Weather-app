@@ -16,19 +16,23 @@ const Input = ({ setLocation, setWeather }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    let city = input.toLowerCase()
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.substring(1))
+      .join(' ');
 
-    if (!sessionStorage.getItem(input)) {
-      fetchCoordinates(input)
+    if (!sessionStorage.getItem(city)) {
+      fetchCoordinates(city)
         .then((coordinates => fetchWeatherByLocation(coordinates.lat, coordinates.lng)))
         .then(weather => {
           setWeather(weather.data);
-          sessionStorage.setItem(input, JSON.stringify(weather.data));
+          sessionStorage.setItem(city, JSON.stringify(weather.data));
         })
-        .then(() => setLocation(input))
+        .then(() => setLocation(city))
         .catch(err => alert('Invalid input'));
     } else {
-      setLocation(input);
-      setWeather(JSON.parse(sessionStorage.getItem(input)));
+      setLocation(city);
+      setWeather(JSON.parse(sessionStorage.getItem(city)));
     }
 
     setInput('');

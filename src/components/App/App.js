@@ -43,7 +43,8 @@ function App() {
       } else {
         setWeather(JSON.parse(sessionStorage.getItem('currentLocationWeather')));
       }
-    });
+    }, () => alert('Pleace, turn on geolocation'));
+    ;
   }, []);
 
   return (
