@@ -8,6 +8,8 @@ import {
 
 import Input from '../Input/Input';
 import CurrentWeather from '../CurrentWeather/CurrentWeather';
+import WeekForecast from '../WeekForecast/WeekForecast';
+
 import { fetchLocation, fetchWeatherByLocation } from '../../api/api';
 import useStyles from './app.styles';
 
@@ -44,13 +46,14 @@ function App() {
 
   return (
     <CssBaseline>
-      <Container component='main' maxWidth='xs'>
+      <Container component='main' maxWidth='md'>
         <Paper elevation={12} className={styles.paper}>
           <Input setLocation={setLocation} setWeather={setWeather} />
           {location !== '' && 
             <Typography align='center' variant='h4' className={styles.city}>{location}</Typography>
           }
           <CurrentWeather currentWeather={weather.current} />
+          <WeekForecast forecast={weather.daily} />
         </Paper> 
       </Container>
     </CssBaseline>

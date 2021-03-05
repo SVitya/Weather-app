@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core';
 
 export default makeStyles((theme) => ({
   search: {
-    marginLeft: theme.spacing(0),
-    marginRight: theme.spacing(0),
+    maxWidth: '200px',
+    margin: '0 auto',
   },
 }));

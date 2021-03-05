@@ -4,9 +4,11 @@ import {
 } from '@material-ui/core';
 
 import { fetchCoordinates, fetchWeatherByLocation } from '../../api/api';
+import useStyles from './input.styles';
 
 const Input = ({ setLocation, setWeather }) => {
   const [input, setInput] = useState('');
+  const styles = useStyles();
 
   const handleChange = (e) => {
     setInput(e.target.value);
@@ -32,12 +34,11 @@ const Input = ({ setLocation, setWeather }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className={styles.search}>
       <TextField
         label='Search'
         value={input}
         onChange={handleChange}
-        fullWidth
       />
     </form>
   )
