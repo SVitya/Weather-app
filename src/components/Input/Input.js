@@ -25,6 +25,7 @@ const Input = ({ setLocation, setWeather }) => {
           sessionStorage.setItem(input, JSON.stringify(weather.data));
         })
         .then(() => setLocation(input))
+        .catch(err => alert('Invalid input'));
     } else {
       setLocation(input);
       setWeather(JSON.parse(sessionStorage.getItem(input)));

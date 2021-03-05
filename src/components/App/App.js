@@ -28,6 +28,7 @@ function App() {
             setLocation(res);
             sessionStorage.setItem('currentLocation', res);
           })
+          .catch(err => console.log(err))
       } else {
         setLocation(sessionStorage.getItem('currentLocation'));
       }
@@ -38,6 +39,7 @@ function App() {
             setWeather(weather.data);
             sessionStorage.setItem('currentLocationWeather', JSON.stringify(weather.data));
           })
+          .catch(err => console.log(err))
       } else {
         setWeather(JSON.parse(sessionStorage.getItem('currentLocationWeather')));
       }
