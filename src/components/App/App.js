@@ -19,31 +19,34 @@ function App() {
   const styles = useStyles();
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      let {latitude, longitude} = pos.coords;
+    if (!sessionStorage.getItem('currentLocation')) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        let {latitude, longitude} = pos.coords;
 
-      if (!sessionStorage.getItem('currentLocation')) {
         fetchLocation(latitude, longitude)
-          .then(res => {
-            setLocation(res);
-            sessionStorage.setItem('currentLocation', res);
+          .then(cityName => {
+            setLocation(cityName);
+            sessionStorage.setItem('currentLocation', cityName);
+            return cityName;
           })
-          .catch(err => console.log(err))
-      } else {
-        setLocation(sessionStorage.getItem('currentLocation'));
-      }
-
-      if (!sessionStorage.getItem('currentLocationWeather')) {
-        fetchWeatherByLocation(latitude, longitude)
-          .then(weather => {
-            setWeather(weather.data);
-            sessionStorage.setItem('currentLocationWeather', JSON.stringify(weather.data));
+          .then(cityName => {
+            if (!sessionStorage.getItem(cityName)) {
+              fetchWeatherByLocation(latitude, longitude)
+                .then(weather => {
+                  setWeather(weather.data);
+                  sessionStorage.setItem(cityName, JSON.stringify(weather.data));
+                })
+                .catch(() => alert(`Can't fetch weather data`))
+            } else {
+              setWeather(JSON.parse(sessionStorage.getItem(cityName)));
+            }
           })
-          .catch(err => console.log(err))
-      } else {
-        setWeather(JSON.parse(sessionStorage.getItem('currentLocationWeather')));
-      }
-    });
+          .catch(() => alert('Something went wrong'));
+      });
+    } else {
+      setLocation(sessionStorage.getItem('currentLocation'));
+      setWeather(JSON.parse(sessionStorage.getItem(sessionStorage.getItem('currentLocation'))));
+    }
   }, []);
 
   return (
@@ -51,7 +54,7 @@ function App() {
       <Container component='main' maxWidth='md'>
         <Paper elevation={12} className={styles.paper}>
           <Input setLocation={setLocation} setWeather={setWeather} />
-          <Typography align='center' variant='h5' component='h1' className={styles.city}>{location !== '' ? location : 'Turn on geolocation and reload page or type the city'}</Typography>
+          <Typography align='center' variant='h5' className={styles.city}>{location !== '' ? location : 'Turn on geolocation or type the city'}</Typography>
           <CurrentWeather currentWeather={weather.current} />
           <WeekForecast forecast={weather.daily} />
         </Paper> 
