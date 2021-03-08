@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import {
-  TextField
-} from '@material-ui/core';
+import { TextField } from '@material-ui/core';
+import PlacesAutocomplete from 'react-places-autocomplete';
 
 import { fetchCoordinates, fetchWeatherByLocation } from '../../api/api';
 import useStyles from './input.styles';
@@ -10,12 +9,11 @@ const Input = ({ setLocation, setWeather }) => {
   const [input, setInput] = useState('');
   const styles = useStyles();
 
-  const handleChange = (e) => {
-    setInput(e.target.value);
+  const handleChange = (input) => {
+    setInput(input);
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSelect = (input) => {
     let upperCaseInput = input
       .toLowerCase()
       .split(' ')
@@ -23,7 +21,7 @@ const Input = ({ setLocation, setWeather }) => {
       .join(' ');
 
     if (!sessionStorage.getItem(upperCaseInput)) {
-      fetchCoordinates(upperCaseInput)
+      fetchCoordinates(input)
         .then(({ city, location }) => {
 
           if(!sessionStorage.getItem(city)) {
@@ -51,15 +49,45 @@ const Input = ({ setLocation, setWeather }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.search}>
-      <TextField
-        label='Search'
-        value={input}
-        onChange={handleChange}
-        fullWidth
-      />
-    </form>
-  )
+    <PlacesAutocomplete
+      value={input}
+      onChange={handleChange}
+      onSelect={handleSelect}
+    >
+      {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+        <div className={styles.search}>
+          <TextField fullWidth
+            {...getInputProps({
+              placeholder: 'Search',
+              className: 'location-search-input',
+            })}
+          />
+          <div className="autocomplete-dropdown-container">
+            {loading && <div>Loading...</div>}
+            {suggestions.map(suggestion => {
+              const className = suggestion.active
+                ? 'suggestion-item--active'
+                : 'suggestion-item';
+              
+              const style = suggestion.active
+                ? { backgroundColor: '#fafafa', cursor: 'pointer' }
+                : { backgroundColor: '#ffffff', cursor: 'pointer' };
+              return (
+                <div
+                  {...getSuggestionItemProps(suggestion, {
+                    className,
+                    style,
+                  })}
+                >
+                  <span>{suggestion.description}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </PlacesAutocomplete>
+  );
 }
 
 export default Input;
