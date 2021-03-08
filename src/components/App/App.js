@@ -43,8 +43,7 @@ function App() {
       } else {
         setWeather(JSON.parse(sessionStorage.getItem('currentLocationWeather')));
       }
-    }, () => alert('Pleace, turn on geolocation'));
-    ;
+    });
   }, []);
 
   return (
@@ -52,9 +51,7 @@ function App() {
       <Container component='main' maxWidth='md'>
         <Paper elevation={12} className={styles.paper}>
           <Input setLocation={setLocation} setWeather={setWeather} />
-          {location !== '' && 
-            <Typography align='center' variant='h4' className={styles.city}>{location}</Typography>
-          }
+          <Typography align='center' variant='h5' component='h1' className={styles.city}>{location !== '' ? location : 'Turn on geolocation and reload page or type the city'}</Typography>
           <CurrentWeather currentWeather={weather.current} />
           <WeekForecast forecast={weather.daily} />
         </Paper> 

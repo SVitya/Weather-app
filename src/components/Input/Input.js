@@ -16,23 +16,35 @@ const Input = ({ setLocation, setWeather }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    let city = input.toLowerCase()
+    let upperCaseInput = input
+      .toLowerCase()
       .split(' ')
       .map((word) => word.charAt(0).toUpperCase() + word.substring(1))
       .join(' ');
 
-    if (!sessionStorage.getItem(city)) {
-      fetchCoordinates(city)
-        .then((coordinates => fetchWeatherByLocation(coordinates.lat, coordinates.lng)))
-        .then(weather => {
-          setWeather(weather.data);
-          sessionStorage.setItem(city, JSON.stringify(weather.data));
+    if (!sessionStorage.getItem(upperCaseInput)) {
+      fetchCoordinates(upperCaseInput)
+        .then(({ city, location }) => {
+
+          if(!sessionStorage.getItem(city)) {
+            fetchWeatherByLocation(location.lat, location.lng)
+              .then(weather => {
+                setWeather(weather.data);
+                sessionStorage.setItem(city, JSON.stringify(weather.data));
+              })
+              .then(() => setLocation(city))
+              .catch(() => alert(`Can't fetch weather data`));
+          } else {
+            setLocation(city)
+            setWeather(JSON.parse(sessionStorage.getItem(city)));
+          }
+
         })
-        .then(() => setLocation(city))
-        .catch(err => alert('Invalid input'));
+        .catch(() => alert('Invalid input'));
+        
     } else {
-      setLocation(city);
-      setWeather(JSON.parse(sessionStorage.getItem(city)));
+      setLocation(upperCaseInput);
+      setWeather(JSON.parse(sessionStorage.getItem(upperCaseInput)));
     }
 
     setInput('');
@@ -44,6 +56,7 @@ const Input = ({ setLocation, setWeather }) => {
         label='Search'
         value={input}
         onChange={handleChange}
+        fullWidth
       />
     </form>
   )
