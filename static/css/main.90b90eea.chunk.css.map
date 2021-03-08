@@ -1,1 +1,0 @@
-{"version":3,"sources":["webpack://src/components/DayForecast/day_forecast.css","webpack://src/components/WeekForecast/week_forecast.css"],"names":[],"mappings":"AAAA,SACE,iBACF,CCFA,WACE,YAAa,CACb,4BACF","file":"main.90b90eea.chunk.css","sourcesContent":[".day div {\r\n  text-align: center;\r\n}",".container {\r\n  display: flex;\r\n  justify-content: space-around;\r\n}"]}
