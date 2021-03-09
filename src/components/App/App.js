@@ -10,50 +10,64 @@ import Input from '../Input/Input';
 import CurrentWeather from '../CurrentWeather/CurrentWeather';
 import WeekForecast from '../WeekForecast/WeekForecast';
 
-import { fetchLocation, fetchWeatherByLocation } from '../../api/api';
+import { fetchLocation, fetchWeatherByCoordinates } from '../../api/api';
 import useStyles from './app.styles';
 
 function App() {
   const [location, setLocation] = useState('');
+  const [coordinates, setCoordinates] = useState({});
   const [weather, setWeather] = useState({});
   const styles = useStyles();
 
   useEffect(() => {
-    if (!sessionStorage.getItem('currentLocation')) {
+    if (!localStorage.getItem('lastLocation')) {
       navigator.geolocation.getCurrentPosition((pos) => {
-        let {latitude, longitude} = pos.coords;
-
+        let { latitude, longitude } = pos.coords;
+  
         fetchLocation(latitude, longitude)
-          .then(cityName => {
-            setLocation(cityName);
-            sessionStorage.setItem('currentLocation', cityName);
-            return cityName;
+          .then(locationName => {
+            setLocation(locationName);
+            setCoordinates({ latitude, longitude });
           })
-          .then(cityName => {
-            if (!sessionStorage.getItem(cityName)) {
-              fetchWeatherByLocation(latitude, longitude)
-                .then(weather => {
-                  setWeather(weather.data);
-                  sessionStorage.setItem(cityName, JSON.stringify(weather.data));
-                })
-                .catch(() => alert(`Can't fetch weather data`))
-            } else {
-              setWeather(JSON.parse(sessionStorage.getItem(cityName)));
-            }
-          })
-          .catch(() => alert('Something went wrong'));
+          .catch (() => console.log(`Can't get location`))
       });
     } else {
-      setLocation(sessionStorage.getItem('currentLocation'));
-      setWeather(JSON.parse(sessionStorage.getItem(sessionStorage.getItem('currentLocation'))));
+      let { locationName, latitude, longitude } = JSON.parse(localStorage.getItem('lastLocation'));
+      setLocation(locationName);
+      setCoordinates({ latitude, longitude });
     }
   }, []);
+
+  useEffect(() => {
+    location !== '' && localStorage.setItem('lastLocation', JSON.stringify({
+      locationName: location,
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude
+    }));
+  }, [location, coordinates]);
+
+  useEffect(() => {
+    if (Object.keys(coordinates).length !== 0) {
+      if (!sessionStorage.getItem(location)) {
+        let { latitude, longitude } = JSON.parse(localStorage.getItem('lastLocation'));
+
+        fetchWeatherByCoordinates(latitude, longitude)
+          .then(weather => {
+            setWeather(weather.data);
+            sessionStorage.setItem(location, JSON.stringify(weather.data));
+          })
+          .catch(() => alert(`Can't fetch weather data`))
+      } else {
+        setWeather(JSON.parse(sessionStorage.getItem(location)));
+      }
+    }
+  }, [coordinates]);
 
   return (
     <CssBaseline>
       <Container component='main' maxWidth='md'>
         <Paper elevation={12} className={styles.paper}>
-          <Input setLocation={setLocation} setWeather={setWeather} />
+          <Input setLocation={setLocation} setWeather={setWeather} setCoordinates={setCoordinates} />
           <Typography align='center' variant='h5' className={styles.city}>{location !== '' ? location : 'Turn on geolocation or type the city'}</Typography>
           <CurrentWeather currentWeather={weather.current} />
           <WeekForecast forecast={weather.daily} />

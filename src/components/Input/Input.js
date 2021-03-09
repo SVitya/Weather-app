@@ -5,7 +5,7 @@ import PlacesAutocomplete from 'react-places-autocomplete';
 import { fetchCoordinates, fetchWeatherByLocation } from '../../api/api';
 import useStyles from './input.styles';
 
-const Input = ({ setLocation, setWeather }) => {
+const Input = ({ setLocation, setWeather, setCoordinates }) => {
   const [input, setInput] = useState('');
   const styles = useStyles();
 
@@ -23,23 +23,10 @@ const Input = ({ setLocation, setWeather }) => {
     if (!sessionStorage.getItem(upperCaseInput)) {
       fetchCoordinates(input)
         .then(({ city, location }) => {
-
-          if(!sessionStorage.getItem(city)) {
-            fetchWeatherByLocation(location.lat, location.lng)
-              .then(weather => {
-                setWeather(weather.data);
-                sessionStorage.setItem(city, JSON.stringify(weather.data));
-              })
-              .then(() => setLocation(city))
-              .catch(() => alert(`Can't fetch weather data`));
-          } else {
-            setLocation(city)
-            setWeather(JSON.parse(sessionStorage.getItem(city)));
-          }
-
+          setLocation(city);
+          setCoordinates({ latitude: location.lat, longitude: location.lng });
         })
         .catch(() => alert('Invalid input'));
-        
     } else {
       setLocation(upperCaseInput);
       setWeather(JSON.parse(sessionStorage.getItem(upperCaseInput)));
